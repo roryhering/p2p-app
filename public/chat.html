@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Chat</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  </head>
+  <body>
+    <section id="join">
+      <form id="joinForm" class="form" action="">
+        <input
+          id="nickname"
+          placeholder="Nickname"
+          autocomplete="off"
+          class="input"
+        /><button>Join</button>
+      </form>
+    </section>
+
+    <section id="chat">
+      <ul id="messages"></ul>
+      <form id="chatForm" class="form" action="">
+        <input
+          id="input"
+          placeholder="Today I..."
+          class="input"
+          autocomplete="off"
+        /><button>Send</button>
+      </form>
+    </section>
+
+    <script>
+      const joinScreen = document.getElementById("join");
+      const chatScreen = document.getElementById("chat");
+
+      const joinForm = document.getElementById("joinForm");
+      const nicknameInput = document.getElementById("nickname");
+
+      const init = () => {
+        chatScreen.style.display = "none";
+        joinForm.addEventListener("submit", (evt) => {
+          evt.preventDefault();
+          if (nicknameInput.value) {
+            connect();
+          }
+        });
+      };
+
+      const connect = () => {
+        joinScreen.style.display = "none";
+        chatScreen.style.display = "block";
+
+        const socket = io();
+        const chatForm = document.getElementById("chatForm");
+        const input = document.getElementById("input");
+        const messages = document.getElementById("messages");
+
+        socket.emit("joined", nicknameInput.value);
+
+        chatForm.addEventListener("submit", (evt) => {
+          evt.preventDefault();
+          if (input.value) {
+            socket.emit("message", {
+              from: nicknameInput.value,
+              msg: input.value,
+            });
+            input.value = "";
+          }
+        });
+
+        socket.on("joined", (nickname) => {
+          const item = document.createElement("li");
+          item.textContent = `${nickname} has joined the chat`;
+          messages.appendChild(item);
+        });
+
+        socket.on("message", ({ from, msg }) => {
+          const item = document.createElement("li");
+          item.textContent = `[${from}]: ${msg}`;
+          messages.appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+      };
+
+      init();
+    </script>
+  </body>
+</html>

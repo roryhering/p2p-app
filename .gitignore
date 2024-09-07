@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+
+# Environment variables
+.env
+
+# IDE and editor files
+.vscode/
+
+# QR Code image
+public/qrcode.png
+
+# Dependency lock files
+package-lock.json
+yarn.lock
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
